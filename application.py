@@ -11,7 +11,7 @@ class Application(tk.Tk):
 
         # Window configuration
         self.title('Playlist Maker')
-        self.geometry('300x200')
+        self.geometry('500x200')
         self.resizable(True, True)
 
         # Main frame configuration
@@ -50,16 +50,28 @@ class Application(tk.Tk):
         album_entry.grid(row=3, column=1)
         duration_entry.grid(row=4, column=1)
 
+        # Listbox
+        song_listbox = tk.Listbox(self.main_frame, listvariable=self.song_list)
+        song_listbox.grid(row=0, column=3, rowspan=6)
 
         # Event handlers
-        def create_song(event):
-            self.song_list.append(Song(link_entry.get()))
+        def create_song(*args):
+            new_song = Song(link_entry.get())
+            song_listbox.insert(tk.END, new_song)
+            self.song_list.append(new_song)
             link_entry.delete(0, tk.END)
+
+        def select_song(*args):
+            selection_index = song_listbox.curselection()[0]
+            print(self.song_list[selection_index], type(self.song_list[selection_index]))
         
         # Event handler bindings
         link_entry.bind('<Return>', create_song)
+        song_listbox.bind('<<ListboxSelect>>', select_song)
 
         # Buttons
+        link_button = ttk.Button(self.main_frame, text='Enter', command=create_song)
+        link_button.grid(row=0, column=2)
 
 
 class API_key_prompt(tk.Tk):
