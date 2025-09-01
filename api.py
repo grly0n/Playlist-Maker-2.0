@@ -6,19 +6,13 @@ from dotenv import load_dotenv
 def get_client_id():
     load_dotenv()
     api_key = os.getenv('SPOTIFY_CLIENT_ID')
-    if api_key: return api_key
-    client_id = input('Please enter your Spotify API client ID: ')
-    with open('.env') as file:
-        file.write(f'SPOTIFY_CLIENT_ID={client_id}')
+    return api_key
 
 
 def get_client_secret():
     load_dotenv()
     api_key = os.getenv('SPOTIFY_CLIENT_SECRET')
-    if api_key: return api_key
-    client_secret = input('Please enter your Spotify API client secret: ')
-    with open('.env') as file:
-        file.write(f'SPOTIFY_CLIENT_SECRET={client_secret}')
+    return api_key
 
 
 def request_access_token(client_id: str, client_secret: str):
