@@ -16,7 +16,13 @@ def get_client_secret():
 
 
 def request_access_token(client_id: str, client_secret: str):
-    encoded_string = str(base64.b64encode(bytes(f'{client_id}:{client_secret}', 'utf-8')))
-    response = requests.post(url='https://accounts.spotify.com/api/token', headers={'Authorization': 'Basic ' + encoded_string, 'Content-Type': 'applicaiton/x-www-form-urlencoded'}, 
-                     data={'grant_type': 'client_credentials'})
-    print(response)
+    auth_header = base64.b64encode(f'{client_id}:{client_secret}'.encode('utf-8')).decode('utf-8')
+    headers = {'Authorization': f'Basic {auth_header}', 'Content-Type': 'application/x-www-form-urlencoded'}
+    data = {'grant_type': 'client_credentials'}
+    response = requests.post('https://accounts.spotify.com/api/token', headers=headers, data=data)
+    
+    if response.status_code == 200:
+        token_info = response.json()
+        return token_info['access_token']
+    else:
+        return ''

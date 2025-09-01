@@ -16,8 +16,9 @@ def main():
 
     if client_id and client_secret:
         # Request API access token
-        print(f'Requesting access token using Client ID {client_id} and Client Secret {client_secret}')
-        api.request_access_token(client_id, client_secret)
+        # print(f'Requesting access token using Client ID {client_id} and Client Secret {client_secret}')
+        # access_token = api.request_access_token(client_id, client_secret)
+        # print(f'Access token: {access_token}')
 
         # Load application
         app = Application()
