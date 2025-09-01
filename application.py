@@ -102,6 +102,7 @@ class API_key_prompt(tk.Tk):
 
             if not access_token:
                 print('Error: invalid Client ID and/or Client Secret')
+                messagebox.showerror(message='Error: Invalid Client ID and/or Client Secret')
             else:
                 api.write_to_env(client_id, client_secret, access_token, expiration)
                 self.destroy()
