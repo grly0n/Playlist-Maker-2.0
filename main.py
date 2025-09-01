@@ -1,25 +1,20 @@
 import api
+from time import time
 from application import Application, API_key_prompt
 
 
 def main():
-    # Check for API key in .env
-    client_id = api.get_client_id()
-    client_secret = api.get_client_secret()
+    # Check for access token in .env
+    access_token = api.get_access_token()
+    expiration = float(api.get_access_token_expiration())
 
-    if not client_id or not client_secret:
+    # If no or expired access token, request new token
+    if not access_token or expiration <= time():
         prompt = API_key_prompt()
         prompt.mainloop()
 
-    client_id = api.get_client_id()
-    client_secret = api.get_client_secret()
-
-    if client_id and client_secret:
-        # Request API access token
-        # print(f'Requesting access token using Client ID {client_id} and Client Secret {client_secret}')
-        # access_token = api.request_access_token(client_id, client_secret)
-        # print(f'Access token: {access_token}')
-
+    # If access token successfully acquired, launch application
+    if api.get_access_token():
         # Load application
         app = Application()
         app.mainloop()

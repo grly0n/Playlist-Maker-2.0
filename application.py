@@ -1,8 +1,8 @@
 import tkinter as tk
+import api
 from tkinter import ttk
 from tkinter import messagebox
 from song import Song
-from api import request_access_token
 
 
 class Application(tk.Tk):
@@ -98,15 +98,12 @@ class API_key_prompt(tk.Tk):
         def submit_credentials():
             client_id = client_id_entry.get()
             client_secret = client_secret_entry.get()
-            access_token = request_access_token(client_id, client_secret)
+            access_token, expiration = api.request_access_token(client_id, client_secret)
 
             if not access_token:
                 print('Error: invalid Client ID and/or Client Secret')
             else:
-                with open('.env', 'w') as file:
-                    file.write(f'SPOTIFY_CLIENT_ID={client_id_entry.get()}\n')
-                    file.write(f'SPOTIFY_CLIENT_SECRET={client_secret_entry.get()}\n')
-                    file.write(f'SPOTIFY_ACCESS_TOKEN={access_token}')
+                api.write_to_env(client_id, client_secret, access_token, expiration)
                 self.destroy()
 
         # Buttons

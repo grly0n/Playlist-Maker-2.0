@@ -1,18 +1,27 @@
 import os
 import requests
 import base64
+from time import time
 from dotenv import load_dotenv
 
 def get_client_id():
     load_dotenv()
-    api_key = os.getenv('SPOTIFY_CLIENT_ID')
-    return api_key
+    return os.getenv('SPOTIFY_CLIENT_ID')
 
 
 def get_client_secret():
     load_dotenv()
-    api_key = os.getenv('SPOTIFY_CLIENT_SECRET')
-    return api_key
+    return os.getenv('SPOTIFY_CLIENT_SECRET')
+
+
+def get_access_token():
+    load_dotenv()
+    return os.getenv('SPOTIFY_ACCESS_TOKEN')
+
+
+def get_access_token_expiration():
+    load_dotenv()
+    return os.getenv('ACCESS_TOKEN_EXPIRATION')
 
 
 def request_access_token(client_id: str, client_secret: str):
@@ -23,6 +32,14 @@ def request_access_token(client_id: str, client_secret: str):
     
     if response.status_code == 200:
         token_info = response.json()
-        return token_info['access_token']
+        return token_info['access_token'], token_info['expires_in'] + time()
     else:
-        return ''
+        return '', 0
+    
+
+def write_to_env(client_id: str, client_secret: str, access_token: str, expiration: float):
+    with open('.env', 'w') as file:
+        file.write(f'SPOTIFY_CLIENT_ID={client_id}\n')
+        file.write(f'SPOTIFY_CLIENT_SECRET={client_secret}\n')
+        file.write(f'SPOTIFY_ACCESS_TOKEN={access_token}\n')
+        file.write(f'ACCESS_TOKEN_EXPIRATION={expiration}')
