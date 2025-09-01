@@ -11,7 +11,7 @@ class Application(tk.Tk):
 
         # Window configuration
         self.title('Playlist Maker')
-        self.geometry('500x200')
+        self.geometry('600x300')
         self.resizable(True, True)
 
         # Main frame configuration
@@ -51,7 +51,7 @@ class Application(tk.Tk):
         duration_entry.grid(row=4, column=1)
 
         # Listbox
-        song_listbox = tk.Listbox(self.main_frame, listvariable=self.song_list)
+        song_listbox = tk.Listbox(self.main_frame, width=40)
         song_listbox.grid(row=0, column=3, rowspan=6)
 
         # Event handlers
