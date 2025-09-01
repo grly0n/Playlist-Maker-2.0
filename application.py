@@ -52,7 +52,12 @@ class Application(tk.Tk):
 
         # Listbox
         song_listbox = tk.Listbox(self.main_frame, width=40)
-        song_listbox.grid(row=0, column=3, rowspan=6)
+        song_listbox.grid(row=0, column=3, rowspan=5)
+        h_scrollbar = ttk.Scrollbar(self.main_frame, orient='horizontal', command=song_listbox.xview)
+        v_scrollbar = ttk.Scrollbar(self.main_frame, orient='vertical', command=song_listbox.yview)
+        h_scrollbar.grid(row=6, column=3, sticky='ew')
+        v_scrollbar.grid(row=0, column=4, rowspan=5, sticky='ns')
+        song_listbox.config(xscrollcommand=h_scrollbar.set, yscrollcommand=v_scrollbar.set)
 
         # Event handlers
         def create_song(*args):
