@@ -1,5 +1,8 @@
 import tkinter as tk
 import api
+import subprocess
+import threading
+import os
 from tkinter import ttk
 from tkinter import messagebox
 from tkinter import filedialog as fd
@@ -117,9 +120,12 @@ class Application(tk.Tk):
         dirpath = fd.askdirectory(title='Select song download directory')
         filepath = fd.asksaveasfilename(title='Select playlist save location', filetypes=[('Text Files', '*.txt'), ('All Files', '*.*')])
         if dirpath and filepath:
+            os.chdir(dirpath)
             with open(f'{filepath}.txt', 'w') as file:
                 for song in self.song_list:
                     file.write(f'{song}\n\n')
+                    download_command = ['spotdl', 'download', song.spotify_link, '--preload', '--output', '{artist} - {title}']
+                    threading.Thread(target=lambda: subprocess.run(download_command), daemon=True).start()
         else:
             messagebox.showerror(title='Error', message='Error: Must provide save locations for songs and playlist')
     
