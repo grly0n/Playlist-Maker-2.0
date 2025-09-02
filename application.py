@@ -71,15 +71,29 @@ class Application(tk.Tk):
             link_entry.delete(0, tk.END)
 
         def select_song(*args):
-            selected_song = self.song_list[song_listbox.curselection()[0]]
+            self.get_selected_song(song_listbox)
             artist_entry.config(state=tk.ACTIVE)
             title_entry.config(state=tk.ACTIVE)
             album_entry.config(state=tk.ACTIVE)
             duration_entry.config(state=tk.ACTIVE)
-            artist_var.set(selected_song.artists)
-            title_var.set(selected_song.title)
-            album_var.set(selected_song.album)
-            duration_var.set(selected_song.duration)
+            artist_var.set(self.selected_song.artists)
+            title_var.set(self.selected_song.title)
+            album_var.set(self.selected_song.album)
+            duration_var.set(self.selected_song.duration)
+            edit_button.config(state=tk.ACTIVE)
+
+        def edit_song(*args):
+            self.selected_song.artists = artist_var.get()
+            self.selected_song.title = title_var.get()
+            self.selected_song.album = album_var.get()
+            self.selected_song.duration = duration_var.get()
+            artist_entry.delete(0, tk.END)
+            title_entry.delete(0, tk.END)
+            album_entry.delete(0, tk.END)
+            duration_entry.delete(0, tk.END)
+            edit_button.config(state=tk.DISABLED)
+            song_listbox.delete(self.selected_index)
+            song_listbox.insert(self.selected_index, self.selected_song)
 
         
         # Event handler bindings
@@ -88,7 +102,14 @@ class Application(tk.Tk):
 
         # Buttons
         link_button = ttk.Button(self.main_frame, text='Enter', command=create_song)
+        edit_button = ttk.Button(self.main_frame, text='Submit changes', command=edit_song, state=tk.DISABLED)
         link_button.grid(row=0, column=2)
+        edit_button.grid(row=5, column=0)
+
+    def get_selected_song(self, song_listbox: tk.Listbox) -> None:
+        if len(song_listbox.curselection()):
+            self.selected_index = song_listbox.curselection()[0]
+            self.selected_song = self.song_list[self.selected_index]
 
 
 class API_key_prompt(tk.Tk):
