@@ -2,6 +2,7 @@ import tkinter as tk
 import api
 from tkinter import ttk
 from tkinter import messagebox
+from tkinter import filedialog as fd
 from song import Song
 
 
@@ -113,7 +114,14 @@ class Application(tk.Tk):
         self.song_list.remove(self.selected_song)
 
     def export_songs(self, *args):
-        print(self.song_list)
+        dirpath = fd.askdirectory(title='Select song download directory')
+        filepath = fd.asksaveasfilename(title='Select playlist save location', filetypes=[('Text Files', '*.txt'), ('All Files', '*.*')])
+        if dirpath and filepath:
+            with open(f'{filepath}.txt', 'w') as file:
+                for song in self.song_list:
+                    file.write(f'{song}\n\n')
+        else:
+            messagebox.showerror(title='Error', message='Error: Must provide save locations for songs and playlist')
     
 
     # Event handler helpers
