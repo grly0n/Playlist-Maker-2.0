@@ -81,6 +81,7 @@ class Application(tk.Tk):
             album_var.set(self.selected_song.album)
             duration_var.set(self.selected_song.duration)
             edit_button.config(state=tk.ACTIVE)
+            delete_button.config(state=tk.ACTIVE)
 
         def edit_song(*args):
             self.selected_song.artists = artist_var.get()
@@ -92,9 +93,19 @@ class Application(tk.Tk):
             album_entry.delete(0, tk.END)
             duration_entry.delete(0, tk.END)
             edit_button.config(state=tk.DISABLED)
+            delete_button.config(state=tk.DISABLED)
             song_listbox.delete(self.selected_index)
             song_listbox.insert(self.selected_index, self.selected_song)
 
+        def delete_song(*args):
+            artist_entry.delete(0, tk.END)
+            title_entry.delete(0, tk.END)
+            album_entry.delete(0, tk.END)
+            duration_entry.delete(0, tk.END)
+            edit_button.config(state=tk.DISABLED)
+            delete_button.config(state=tk.DISABLED)
+            song_listbox.delete(self.selected_index)
+            self.song_list.remove(self.selected_song)
         
         # Event handler bindings
         link_entry.bind('<Return>', create_song)
@@ -103,8 +114,10 @@ class Application(tk.Tk):
         # Buttons
         link_button = ttk.Button(self.main_frame, text='Enter', command=create_song)
         edit_button = ttk.Button(self.main_frame, text='Submit changes', command=edit_song, state=tk.DISABLED)
+        delete_button = ttk.Button(self.main_frame, text='Delete song', command=delete_song, state=tk.DISABLED)
         link_button.grid(row=0, column=2)
         edit_button.grid(row=5, column=0)
+        delete_button.grid(row=5, column=1)
 
     def get_selected_song(self, song_listbox: tk.Listbox) -> None:
         if len(song_listbox.curselection()):
