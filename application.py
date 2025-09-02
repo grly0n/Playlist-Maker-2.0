@@ -53,89 +53,85 @@ class Application(tk.Tk):
         title_entry.grid(row=2, column=1)
         album_entry.grid(row=3, column=1)
         duration_entry.grid(row=4, column=1)
+        self.entries_dict = {'link': link_entry, 'artist': artist_entry, 'title': title_entry, 'album': album_entry, 'duration': duration_entry}
+        self.variables_dict = {'artist': artist_var, 'title': title_var, 'album': album_var, 'duration': duration_var}
 
         # Listbox
-        song_listbox = tk.Listbox(self.main_frame, width=40)
-        song_listbox.grid(row=0, column=3, rowspan=5)
-        h_scrollbar = ttk.Scrollbar(self.main_frame, orient='horizontal', command=song_listbox.xview)
-        v_scrollbar = ttk.Scrollbar(self.main_frame, orient='vertical', command=song_listbox.yview)
+        self.song_listbox = tk.Listbox(self.main_frame, width=40)
+        self.song_listbox.grid(row=0, column=3, rowspan=5)
+        h_scrollbar = ttk.Scrollbar(self.main_frame, orient='horizontal', command=self.song_listbox.xview)
+        v_scrollbar = ttk.Scrollbar(self.main_frame, orient='vertical', command=self.song_listbox.yview)
         h_scrollbar.grid(row=6, column=3, sticky='ew')
         v_scrollbar.grid(row=0, column=4, rowspan=5, sticky='ns')
-        song_listbox.config(xscrollcommand=h_scrollbar.set, yscrollcommand=v_scrollbar.set)
-
-        # Event handlers
-        def create_song(*args):
-            new_song = Song(link_entry.get())
-            song_listbox.insert(tk.END, new_song)
-            self.song_list.append(new_song)
-            link_entry.delete(0, tk.END)
-
-        def select_song(*args):
-            self.get_selected_song(song_listbox)
-            artist_entry.config(state=tk.ACTIVE)
-            title_entry.config(state=tk.ACTIVE)
-            album_entry.config(state=tk.ACTIVE)
-            duration_entry.config(state=tk.ACTIVE)
-            artist_var.set(self.selected_song.artists)
-            title_var.set(self.selected_song.title)
-            album_var.set(self.selected_song.album)
-            duration_var.set(self.selected_song.duration)
-            edit_button.config(state=tk.ACTIVE)
-            delete_button.config(state=tk.ACTIVE)
-
-        def edit_song(*args):
-            self.selected_song.artists = artist_var.get()
-            self.selected_song.title = title_var.get()
-            self.selected_song.album = album_var.get()
-            self.selected_song.duration = duration_var.get()
-            artist_entry.delete(0, tk.END)
-            title_entry.delete(0, tk.END)
-            album_entry.delete(0, tk.END)
-            duration_entry.delete(0, tk.END)
-            artist_entry.config(state=tk.DISABLED)
-            title_entry.config(state=tk.DISABLED)
-            album_entry.config(state=tk.DISABLED)
-            duration_entry.config(state=tk.DISABLED)
-            edit_button.config(state=tk.DISABLED)
-            delete_button.config(state=tk.DISABLED)
-            song_listbox.delete(self.selected_index)
-            song_listbox.insert(self.selected_index, self.selected_song)
-
-        def delete_song(*args):
-            artist_entry.delete(0, tk.END)
-            title_entry.delete(0, tk.END)
-            album_entry.delete(0, tk.END)
-            duration_entry.delete(0, tk.END)
-            artist_entry.config(state=tk.DISABLED)
-            title_entry.config(state=tk.DISABLED)
-            album_entry.config(state=tk.DISABLED)
-            duration_entry.config(state=tk.DISABLED)
-            edit_button.config(state=tk.DISABLED)
-            delete_button.config(state=tk.DISABLED)
-            song_listbox.delete(self.selected_index)
-            self.song_list.remove(self.selected_song)
-
-        def export_songs(*args):
-            print(self.song_list)
+        self.song_listbox.config(xscrollcommand=h_scrollbar.set, yscrollcommand=v_scrollbar.set)
         
         # Event handler bindings
-        link_entry.bind('<Return>', create_song)
-        song_listbox.bind('<<ListboxSelect>>', select_song)
+        link_entry.bind('<Return>', self.create_song)
+        self.song_listbox.bind('<<ListboxSelect>>', self.select_song)
 
         # Buttons
-        link_button = ttk.Button(self.main_frame, text='Enter', command=create_song)
-        edit_button = ttk.Button(self.main_frame, text='Submit changes', command=edit_song, state=tk.DISABLED)
-        delete_button = ttk.Button(self.main_frame, text='Delete song', command=delete_song, state=tk.DISABLED)
-        export_button = ttk.Button(self.main_frame, text='Export songs', command=export_songs)
+        link_button = ttk.Button(self.main_frame, text='Enter', command=self.create_song)
+        edit_button = ttk.Button(self.main_frame, text='Submit changes', command=self.edit_song, state=tk.DISABLED)
+        delete_button = ttk.Button(self.main_frame, text='Delete song', command=self.delete_song, state=tk.DISABLED)
+        export_button = ttk.Button(self.main_frame, text='Export songs', command=self.export_songs)
         link_button.grid(row=0, column=2)
         edit_button.grid(row=5, column=0)
         delete_button.grid(row=5, column=1)
         export_button.grid(row=5, column=2)
+        self.buttons_dict = {'link': link_button, 'edit': edit_button, 'delete': delete_button, 'export': export_button}
 
-    def get_selected_song(self, song_listbox: tk.Listbox) -> None:
-        if len(song_listbox.curselection()):
-            self.selected_index = song_listbox.curselection()[0]
+
+    # Event handlers
+    def create_song(self, *args):
+        new_song = Song(self.entries_dict['link'].get())
+        self.song_listbox.insert(tk.END, new_song)
+        self.song_list.append(new_song)
+        self.entries_dict['link'].delete(0, tk.END)
+
+    def select_song(self, *args):
+        self.get_selected_song()
+        self.change_editing_widgets_state(tk.ACTIVE)
+        self.variables_dict['artist'].set(self.selected_song.artists)
+        self.variables_dict['title'].set(self.selected_song.title)
+        self.variables_dict['album'].set(self.selected_song.album)
+        self.variables_dict['duration'].set(self.selected_song.duration)
+
+    def edit_song(self, *args):
+        self.selected_song.artists = self.variables_dict['artist'].get()
+        self.selected_song.title = self.variables_dict['title'].get()
+        self.selected_song.album = self.variables_dict['album'].get()
+        self.selected_song.duration = self.variables_dict['duration'].get()
+        self.clear_editing_entries()
+        self.change_editing_widgets_state(tk.DISABLED)
+        self.song_listbox.delete(self.selected_index)
+        self.song_listbox.insert(self.selected_index, self.selected_song)
+
+    def delete_song(self, *args):
+        self.clear_editing_entries()
+        self.change_editing_widgets_state(tk.DISABLED)
+        self.song_listbox.delete(self.selected_index)
+        self.song_list.remove(self.selected_song)
+
+    def export_songs(self, *args):
+        print(self.song_list)
+    
+
+    # Event handler helpers
+    def get_selected_song(self) -> None:
+        if len(self.song_listbox.curselection()):
+            self.selected_index = self.song_listbox.curselection()[0]
             self.selected_song = self.song_list[self.selected_index]
+
+    def change_editing_widgets_state(self, state) -> None:
+        for entry in {'artist', 'title', 'album', 'duration'}:
+            self.entries_dict[entry].config(state=state)
+        for button in {'edit', 'delete'}:
+            self.buttons_dict[button].config(state=state)
+
+    def clear_editing_entries(self):
+        for entry in {'artist', 'title', 'album', 'duration'}:
+            self.entries_dict[entry].delete(0, tk.END) 
+
 
 
 class API_key_prompt(tk.Tk):

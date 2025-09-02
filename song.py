@@ -4,12 +4,16 @@ import api
 class Song:
   def __init__(self, link: str):
     self.spotify_link = link
-    response = api.request_song_info(self.spotify_link).json()
+    response = api.request_song_info(self.spotify_link)
     
-    self.album = response['album']['name']
-    self.artists = ', '.join(artist['name'] for artist in response['artists'])
-    self.title = response['name']
-    self.duration = self.calculate_duration(response['duration_ms'])
+    if response.status_code == 200:
+      response = response.json()
+      self.album = response['album']['name']
+      self.artists = ', '.join(artist['name'] for artist in response['artists'])
+      self.title = response['name']
+      self.duration = self.calculate_duration(response['duration_ms'])
+    else:
+      print(response.status_code, response.text)
     
 
   def __repr__(self):
