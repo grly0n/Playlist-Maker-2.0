@@ -39,11 +39,15 @@ class Application(tk.Tk):
         label5.grid(row=4, column=0, padx=10, sticky='E')
 
         # Entries
+        artist_var = tk.StringVar()
+        title_var = tk.StringVar()
+        album_var = tk.StringVar()
+        duration_var = tk.DoubleVar()
         link_entry = ttk.Entry(self.main_frame)
-        artist_entry = ttk.Entry(self.main_frame, state=tk.DISABLED)
-        title_entry = ttk.Entry(self.main_frame, state=tk.DISABLED)
-        album_entry = ttk.Entry(self.main_frame, state=tk.DISABLED)
-        duration_entry = ttk.Entry(self.main_frame, state=tk.DISABLED)
+        artist_entry = ttk.Entry(self.main_frame, state=tk.DISABLED, textvariable=artist_var)
+        title_entry = ttk.Entry(self.main_frame, state=tk.DISABLED, textvariable=title_var)
+        album_entry = ttk.Entry(self.main_frame, state=tk.DISABLED, textvariable=album_var)
+        duration_entry = ttk.Entry(self.main_frame, state=tk.DISABLED, textvariable=duration_var)
         link_entry.grid(row=0, column=1)
         artist_entry.grid(row=1, column=1)
         title_entry.grid(row=2, column=1)
@@ -67,8 +71,16 @@ class Application(tk.Tk):
             link_entry.delete(0, tk.END)
 
         def select_song(*args):
-            selection_index = song_listbox.curselection()[0]
-            print(self.song_list[selection_index], type(self.song_list[selection_index]))
+            selected_song = self.song_list[song_listbox.curselection()[0]]
+            artist_entry.config(state=tk.ACTIVE)
+            title_entry.config(state=tk.ACTIVE)
+            album_entry.config(state=tk.ACTIVE)
+            duration_entry.config(state=tk.ACTIVE)
+            artist_var.set(selected_song.artists)
+            title_var.set(selected_song.title)
+            album_var.set(selected_song.album)
+            duration_var.set(selected_song.duration)
+
         
         # Event handler bindings
         link_entry.bind('<Return>', create_song)
