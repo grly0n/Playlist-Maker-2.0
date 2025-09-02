@@ -42,7 +42,7 @@ class Application(tk.Tk):
         artist_var = tk.StringVar()
         title_var = tk.StringVar()
         album_var = tk.StringVar()
-        duration_var = tk.DoubleVar()
+        duration_var = tk.StringVar()
         link_entry = ttk.Entry(self.main_frame)
         artist_entry = ttk.Entry(self.main_frame, state=tk.DISABLED, textvariable=artist_var)
         title_entry = ttk.Entry(self.main_frame, state=tk.DISABLED, textvariable=title_var)

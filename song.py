@@ -9,8 +9,16 @@ class Song:
     self.album = response['album']['name']
     self.artists = ', '.join(artist['name'] for artist in response['artists'])
     self.title = response['name']
-    self.duration = response['duration_ms'] / 1000
+    self.duration = self.calculate_duration(response['duration_ms'])
     
 
   def __repr__(self):
     return f'{self.artists} - {self.title} - {self.album} ({self.duration})'
+  
+
+  def calculate_duration(self, duration: float):
+    total_duration_seconds = round(duration / 1000)
+    duration_minutes = int(total_duration_seconds / 60)
+    duration_seconds = total_duration_seconds % 60
+    return f'{duration_minutes}:{duration_seconds:02d}'
+  
