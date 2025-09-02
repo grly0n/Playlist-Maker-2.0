@@ -92,6 +92,10 @@ class Application(tk.Tk):
             title_entry.delete(0, tk.END)
             album_entry.delete(0, tk.END)
             duration_entry.delete(0, tk.END)
+            artist_entry.config(state=tk.DISABLED)
+            title_entry.config(state=tk.DISABLED)
+            album_entry.config(state=tk.DISABLED)
+            duration_entry.config(state=tk.DISABLED)
             edit_button.config(state=tk.DISABLED)
             delete_button.config(state=tk.DISABLED)
             song_listbox.delete(self.selected_index)
@@ -102,10 +106,17 @@ class Application(tk.Tk):
             title_entry.delete(0, tk.END)
             album_entry.delete(0, tk.END)
             duration_entry.delete(0, tk.END)
+            artist_entry.config(state=tk.DISABLED)
+            title_entry.config(state=tk.DISABLED)
+            album_entry.config(state=tk.DISABLED)
+            duration_entry.config(state=tk.DISABLED)
             edit_button.config(state=tk.DISABLED)
             delete_button.config(state=tk.DISABLED)
             song_listbox.delete(self.selected_index)
             self.song_list.remove(self.selected_song)
+
+        def export_songs(*args):
+            print(self.song_list)
         
         # Event handler bindings
         link_entry.bind('<Return>', create_song)
@@ -115,9 +126,11 @@ class Application(tk.Tk):
         link_button = ttk.Button(self.main_frame, text='Enter', command=create_song)
         edit_button = ttk.Button(self.main_frame, text='Submit changes', command=edit_song, state=tk.DISABLED)
         delete_button = ttk.Button(self.main_frame, text='Delete song', command=delete_song, state=tk.DISABLED)
+        export_button = ttk.Button(self.main_frame, text='Export songs', command=export_songs)
         link_button.grid(row=0, column=2)
         edit_button.grid(row=5, column=0)
         delete_button.grid(row=5, column=1)
+        export_button.grid(row=5, column=2)
 
     def get_selected_song(self, song_listbox: tk.Listbox) -> None:
         if len(song_listbox.curselection()):

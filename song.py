@@ -4,7 +4,6 @@ import api
 class Song:
   def __init__(self, link: str):
     self.spotify_link = link
-    print('Pulling Spotify information for link', self.spotify_link)
     response = api.request_song_info(self.spotify_link).json()
     
     self.album = response['album']['name']
