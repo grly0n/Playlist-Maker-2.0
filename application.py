@@ -18,11 +18,7 @@ class DownloadThread(threading.Thread):
 
     def run(self):
         download_command = ['spotdl', 'download', self.link, '--preload', '--output', '{artist} - {title}']
-        # result = subprocess.run(download_command)
-        print(f'Running thread with link {self.link}')
-        for i in range(5):
-            time.sleep(1)
-        print('Thread completed!')
+        subprocess.run(download_command)
         self.result = True
 
 
@@ -64,6 +60,7 @@ class Application(tk.Tk):
         title_var = tk.StringVar()
         album_var = tk.StringVar()
         duration_var = tk.StringVar()
+        progress_var = tk.StringVar()
         link_entry = ttk.Entry(self.main_frame)
         artist_entry = ttk.Entry(self.main_frame, state=tk.DISABLED, textvariable=artist_var)
         title_entry = ttk.Entry(self.main_frame, state=tk.DISABLED, textvariable=title_var)
@@ -75,7 +72,7 @@ class Application(tk.Tk):
         album_entry.grid(row=3, column=1)
         duration_entry.grid(row=4, column=1)
         self.entries_dict = {'link': link_entry, 'artist': artist_entry, 'title': title_entry, 'album': album_entry, 'duration': duration_entry}
-        self.variables_dict = {'artist': artist_var, 'title': title_var, 'album': album_var, 'duration': duration_var}
+        self.variables_dict = {'artist': artist_var, 'title': title_var, 'album': album_var, 'duration': duration_var, 'progress': progress_var}
 
         # Listbox
         self.song_listbox = tk.Listbox(self.main_frame, width=40)
@@ -100,6 +97,14 @@ class Application(tk.Tk):
         delete_button.grid(row=5, column=1)
         export_button.grid(row=5, column=2)
         self.buttons_dict = {'link': link_button, 'edit': edit_button, 'delete': delete_button, 'export': export_button}
+
+
+    def create_progress_bar(self):
+        self.progress_bar = ttk.Progressbar(self.main_frame, length=250)
+        self.progress_bar.grid(row=7, column=0, columnspan=3)
+        self.variables_dict['progress'].set(f'Progress: {self.download_successes}/{self.song_list_length}')
+        self.progress_label = ttk.Label(self.main_frame, textvariable=self.variables_dict['progress'])
+        self.progress_label.grid(row=8, column=0, sticky='EW')
 
 
     # Event handlers
@@ -145,6 +150,7 @@ class Application(tk.Tk):
         filepath = fd.asksaveasfilename(title='Select playlist save location', filetypes=[('Text Files', '*.txt'), ('All Files', '*.*')])
         self.song_list_length = len(self.song_list)
         self.download_successes = 0
+        self.create_progress_bar()
         if dirpath and filepath:
             os.chdir(dirpath)
             with open(f'{filepath}.txt', 'w') as file:
@@ -164,7 +170,8 @@ class Application(tk.Tk):
         else:
             if thread.result is True:
                 self.download_successes += 1
-                print(f'Download progress: {self.download_successes}/{self.song_list_length}')
+                self.variables_dict['progress'].set(f'Progress: {self.download_successes}/{self.song_list_length}')
+                self.progress_bar['value'] += 1 / self.song_list_length * 100
     
 
     # Event handler helpers
