@@ -1,6 +1,12 @@
 import api
 
 
+class InvalidIDException(Exception):
+  def __init__(self, message):
+    self.message = message
+    super().__init__(self.message)
+
+
 class Song:
   def __init__(self, link: str):
     self.spotify_link = link
@@ -12,6 +18,8 @@ class Song:
       self.artists = ', '.join(artist['name'] for artist in response['artists'])
       self.title = response['name']
       self.duration = self.calculate_duration(response['duration_ms'])
+    elif response.status_code == 400:
+      raise InvalidIDException('Invalid Spotify ID')
     else:
       print(response.status_code, response.text)
     

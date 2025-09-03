@@ -3,10 +3,27 @@ import api
 import subprocess
 import threading
 import os
+import time
 from tkinter import ttk
 from tkinter import messagebox
 from tkinter import filedialog as fd
-from song import Song
+from song import Song, InvalidIDException
+
+
+class DownloadThread(threading.Thread):
+    def __init__(self, link: str):
+        super().__init__()
+        self.result = None
+        self.link = link
+
+    def run(self):
+        download_command = ['spotdl', 'download', self.link, '--preload', '--output', '{artist} - {title}']
+        # result = subprocess.run(download_command)
+        print(f'Running thread with link {self.link}')
+        for i in range(5):
+            time.sleep(1)
+        print('Thread completed!')
+        self.result = True
 
 
 class Application(tk.Tk):
@@ -87,10 +104,17 @@ class Application(tk.Tk):
 
     # Event handlers
     def create_song(self, *args):
-        new_song = Song(self.entries_dict['link'].get())
-        self.song_listbox.insert(tk.END, new_song)
-        self.song_list.append(new_song)
-        self.entries_dict['link'].delete(0, tk.END)
+        try:
+            new_song = Song(self.entries_dict['link'].get())
+        except IndexError:
+            messagebox.showerror(title='Error', message='Error: invalid Spotify link provided')
+        except InvalidIDException:
+            messagebox.showerror(title='Error', message='Error: invalid Spotify track ID provided')
+        else:
+            self.song_listbox.insert(tk.END, new_song)
+            self.song_list.append(new_song)
+        finally:
+            self.entries_dict['link'].delete(0, tk.END)
 
     def select_song(self, *args):
         self.get_selected_song()
@@ -119,15 +143,28 @@ class Application(tk.Tk):
     def export_songs(self, *args):
         dirpath = fd.askdirectory(title='Select song download directory')
         filepath = fd.asksaveasfilename(title='Select playlist save location', filetypes=[('Text Files', '*.txt'), ('All Files', '*.*')])
+        self.song_list_length = len(self.song_list)
+        self.download_successes = 0
         if dirpath and filepath:
             os.chdir(dirpath)
             with open(f'{filepath}.txt', 'w') as file:
                 for song in self.song_list:
                     file.write(f'{song}\n\n')
-                    download_command = ['spotdl', 'download', song.spotify_link, '--preload', '--output', '{artist} - {title}']
-                    threading.Thread(target=lambda: subprocess.run(download_command), daemon=True).start()
+                    thread = DownloadThread(song.spotify_link)
+                    thread.start()
+                    self.monitor_thread(thread)
+                    
         else:
             messagebox.showerror(title='Error', message='Error: Must provide save locations for songs and playlist')
+
+
+    def monitor_thread(self, thread: DownloadThread):
+        if thread.is_alive():
+            self.after(100, lambda: self.monitor_thread(thread))
+        else:
+            if thread.result is True:
+                self.download_successes += 1
+                print(f'Download progress: {self.download_successes}/{self.song_list_length}')
     
 
     # Event handler helpers
@@ -195,4 +232,4 @@ class API_key_prompt(tk.Tk):
 
         # Buttons
         enter_button = ttk.Button(self.main_frame, text='Enter', command=submit_credentials)
-        enter_button.grid(row=3, column=1, pady=10, columnspan=2)
+        enter_button.grid(row=3, column=1, pady=10, columnspan=2)     

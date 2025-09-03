@@ -10,6 +10,7 @@ def check_client_id_and_secret(client_id: str | None, client_secret: str | None)
 
 def check_token_validity(client_id: str, client_secret: str, expiration: float) -> None:
     # If expired access token, request new token
+    print(expiration, time())
     if expiration <= time():
         access_token, expiration = api.request_access_token(client_id, client_secret)
         api.write_to_env(client_id, client_secret, access_token, expiration)
