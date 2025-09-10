@@ -12,3 +12,5 @@ The main workflow of the Playlist Maker is:
 Spotify song information is fetched using the Spotify API, and songs are converted to MP3 using (spotdl)[https://github.com/spotDL/spotify-downloader].
 
 Playlists are saved in a `.txt` file, and entries are in the form "Artist - Title - Album (Duration)".
+
+**Note:** At this stage of development the provided `.exe` file does not run the application properly.
